@@ -1,0 +1,298 @@
+import java.util.Scanner;
+
+public class L2 {
+	
+	void showField(char[][] fieldData){
+		System.out.println(
+			"  "+fieldData[0][0]+" | "+fieldData[0][1]+" | "+fieldData[0][2]+"\n"+
+			" ———————————\n"+
+			"  "+fieldData[1][0]+" | "+fieldData[1][1]+" | "+fieldData[1][2]+"\n"+
+			" ———————————\n"+
+			"  "+fieldData[2][0]+" | "+fieldData[2][1]+" | "+fieldData[2][2]
+		);
+	}
+	
+	boolean checkMove(char[][] fieldData,int row,int column) {
+		boolean move = true;
+		if((row != 0 && row != 1 && row != 2) || (column != 0 && column != 1 && column != 2)) {
+			System.out.println("Невірні координати");
+			move = false;
+		}
+		if(move) {
+			if(fieldData[row][column] != ' ') {
+				System.out.println("Це поле зайнято");
+				move = false;
+			}
+		}
+		return move;
+	}
+	
+	boolean checkWin(char[][] fieldData){
+		boolean win = false;
+		
+		for(int i = 0; i < 3; i++) {
+			if(((fieldData[i][0] == fieldData[i][1]) && (fieldData[i][1] == fieldData[i][2])) && fieldData[i][0] != ' ') {
+				
+				win = true;
+			}
+			else if(((fieldData[0][i] == fieldData[1][i]) && (fieldData[1][i] == fieldData[2][i])) && fieldData[0][i] != ' ') {
+				
+				win = true;
+			}
+		}
+		
+		
+		if(((fieldData[0][0] == fieldData[1][1]) && (fieldData[1][1] == fieldData[2][2])) && fieldData[1][1] != ' ') {
+			
+			win = true;
+		}
+		if(((fieldData[2][0] == fieldData[1][1]) && (fieldData[1][1] == fieldData[0][2])) && fieldData[1][1] != ' ') {
+			
+			win = true;
+		}
+		
+		
+		return win;
+	}
+	
+	void pvpGame(char[][] fieldData){
+		int moveCounter = 1;
+		char winner = ' ';
+		Scanner in = new Scanner(System.in);
+		
+		while(moveCounter < 10 && !checkWin(fieldData)) {
+			showField(fieldData);
+			
+			System.out.print("Введіть координати вашого ходу.\nРядок(1,2 або 3):");
+			int row = in.nextInt();
+			row--;
+			System.out.print("Стовпчик(1,2 або 3):");
+			int column = in.nextInt();
+			column--;
+			
+			if(checkMove(fieldData, row, column)){
+				if(moveCounter % 2 == 0) {
+					fieldData[row][column] = 'X';
+				}
+				else {
+					fieldData[row][column] = 'O';
+				}
+				winner = fieldData[row][column];
+				moveCounter++;
+			}
+		}
+		
+		showField(fieldData);
+		if(checkWin(fieldData)) {
+			System.out.println(winner + " Виграли");
+		}
+		else System.out.println("Нічия");
+	}
+	
+	int[] computerMove(char[][] fieldData,int row,int column) {
+		int[] cm = {-1,-1};
+		int counterValue1 = 0;
+		int counterValue2 = 0;
+		char Value1 = 'O';
+		char Value2 = 'X';
+		
+		if(fieldData[1][1] == ' ') {
+			cm[0] = cm[1] = 1;
+			return cm;
+		}
+		
+		for(int l = 0; l < 2; l++) {
+			
+		
+			for(int i = 0; i < 3; i++) {
+				
+				for(int j = 0; j<3;j++) {
+					if(fieldData[i][j] == Value1) counterValue1++;
+					else if(fieldData[i][j] == Value2)counterValue2++;
+				}
+				if(counterValue1 == 2 && counterValue2 == 0) {
+					cm[0] = i;
+					if(fieldData[i][0] == ' ')cm[1] = 0;
+					else if(fieldData[i][1] == ' ')cm[1] = 1;
+					else cm[1] = 2;
+					
+					return cm;
+				}
+				counterValue1 = counterValue2 = 0;
+				for(int j = 0; j<3;j++) {
+					if(fieldData[j][i] == Value1) counterValue1++;
+					else if(fieldData[j][i] == Value2)counterValue2++;
+				}
+				if(counterValue1 == 2 && counterValue2 == 0) {
+					cm[1] = i;
+					if(fieldData[0][i] == ' ')cm[0] = 0;
+					else if(fieldData[1][i] == ' ')cm[0] = 1;
+					else cm[0] = 2;
+					
+					return cm;
+				}
+				counterValue1 = counterValue2 = 0;
+			}
+			//---------------------------------------------------------
+			if(((fieldData[0][0] == Value1) && (fieldData[2][2] == ' '))||((fieldData[2][2] == Value1) && (fieldData[0][0] == ' '))) {
+				if(fieldData[0][0] == ' ') {
+					cm[0] = cm[1] = 0;
+					return cm;
+				}
+				else {
+					cm[0] = cm[1] = 2;
+					return cm;
+				}
+			}
+			
+			if(((fieldData[0][2] == Value1) && (fieldData[2][0] == ' '))||((fieldData[2][0] == Value1) && (fieldData[0][2] == ' '))) {
+				if(fieldData[0][2] == ' ') {
+					cm[0] = 0;
+					cm[1] = 2;
+					return cm;
+				}
+				else {
+					cm[0] = 2;
+					cm[1] = 0;
+					return cm;
+				}
+			}
+			Value1 = 'X';
+			Value2 = 'O';
+		}
+		
+		//-------------------------------------------------------------
+		if(((fieldData[0][0] == fieldData[1][1]) && (fieldData[2][2] == ' '))||((fieldData[2][2] == fieldData[1][1]) && (fieldData[0][0] == ' '))) {
+			if(fieldData[0][0] == ' ') {
+				cm[0] = cm[1] = 0;
+				return cm;
+			}
+			else {
+				cm[0] = cm[1] = 2;
+				return cm;
+			}
+		}
+		
+		if(((fieldData[0][2] == fieldData[1][1]) && (fieldData[2][0] == ' '))||((fieldData[2][0] == fieldData[1][1]) && (fieldData[0][2] == ' '))) {
+			if(fieldData[0][2] == ' ') {
+				cm[0] = 0;
+				cm[1] = 2;
+				return cm;
+			}
+			else {
+				cm[0] = 2;
+				cm[1] = 0;
+				return cm;
+			}
+		}
+		//---------------------------------------------
+		if(row - 1 > -1) {
+			if(fieldData[row-1][column] == ' ') {
+				cm[0] = row-1;
+				cm[1] = column;
+				return cm;
+			}
+		}
+		else if(row + 1 < 3) {
+			if(fieldData[row+1][column] == ' ') {
+				cm[0] = row+1;
+				cm[1] = column;
+				return cm;
+			}
+		}
+		else if(column + 1 < 3) {
+			if(fieldData[row][column+1] == ' ') {
+				cm[0] = row;
+				cm[1] = column+1;
+				return cm;
+			}
+		}
+		else if(column - 1 > -1) {
+			if(fieldData[row][column-1] == ' ') {
+				cm[0] = row;
+				cm[1] = column-1;
+				return cm;
+			}
+		}
+		
+			for(int i = 0;i < 3;i++) {
+				for(int j = 0;j<3;j++) {
+					if(fieldData[i][j]==' ') {
+						cm[0] = i;
+						cm[1] = j;
+						return cm;
+					}
+				}
+			}
+		
+		
+		
+		return cm;
+	}
+	
+	void pveGame(char[][] fieldData, boolean playerStart){
+		int moveCounter = 0;
+		String winner = "";
+		Scanner in = new Scanner(System.in);
+		
+		if(!playerStart) {
+			fieldData[1][1] = 'O';
+			moveCounter++;
+		}
+		
+		while(moveCounter < 9 && !checkWin(fieldData)) {
+			showField(fieldData);
+			
+			System.out.print("Введіть координати вашого ходу.\nРядок(1,2 або 3):");
+			int row = in.nextInt();
+			row--;
+			System.out.print("Стовпчик(1,2 або 3):");
+			int column = in.nextInt();
+			column--;
+			
+			if(checkMove(fieldData, row, column)){
+				fieldData[row][column] = 'X';
+				winner = "Ви(X) виграли";
+				moveCounter++;
+			
+				if(!checkWin(fieldData) && moveCounter < 9) {
+					fieldData[computerMove(fieldData,row,column)[0]][computerMove(fieldData,row,column)[1]] = 'O';
+					winner = "Комп'ютер(O) виграв";
+					moveCounter++;
+				}
+			}
+		}
+		
+		showField(fieldData);
+		if(checkWin(fieldData)) {
+			System.out.println(winner);
+		}
+		else System.out.println("Нічия");
+	} 
+	
+	public static void main(String[] args) {
+		L2 ex = new L2();
+		Scanner in = new Scanner(System.in);
+		
+		char[][] fieldData = {{' ',' ',' '},
+							  {' ',' ',' '},
+				              {' ',' ',' '}};
+		
+		boolean play = true;
+		while(play) {
+			System.out.println("Оберіть режим гри:\n1 - два гравця\n2 - з комп'ютером");
+			int choose = in.nextInt();
+			if(choose == 1) ex.pvpGame(fieldData);
+			if(choose == 2) {
+				System.out.println("Бажаєте ходити першим:\n1 -так\n2 - ні");
+				int firstMove = in.nextInt();
+				if(firstMove == 1) ex.pveGame(fieldData, true);
+				else if(firstMove == 2)ex.pveGame(fieldData, false);
+			}
+			System.out.println("Бажаєте зіграти щераз?\n1 -так\n2 - ні");
+			int restart = in.nextInt();
+			if(restart == 2)play = false;
+		}
+		
+	}
+}
