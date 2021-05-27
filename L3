@@ -1,0 +1,121 @@
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
+
+public class L3 {
+	public static void main(String[] args) {
+		
+		System.out.println("123");
+		
+		House h1 = new House("Baker street 221B",6,0,600,0,15);
+		
+		for(int i =0; i < h1.numOfFlats;i++) {
+			h1.people[i+1] = (int) (Math.random()*6);
+			h1.area[i+1] = (int) (70 + Math.random()*20);
+			h1.numOfPeople += h1.people[i+1];
+		}
+		
+		h1.displayHouseInfo();
+		
+		System.out.println("\n\n\n");
+		
+		for(int i =0; i < h1.numOfFlats;i++) {
+			h1.displayFlatInfo(i+1);
+			System.out.println();
+		}
+		
+		
+		
+		LocalDate first = LocalDate.of(2017, 9, 25);
+		LocalDate last = LocalDate.of(2017, 11, 20);
+		
+		
+		h1.calculateDeb(first, last);
+		
+		h1.displayDeb();
+        
+	}
+		
+}
+
+
+/*Створіть наступну модель: Є багатоквартирний дім, модель повинна дозволяти прописувати/виписувати  
+мешканців, нараховувати квартплату в залежності від площі квартир, давати можливість сплачувати 
+мешканцям квартплату, формувати звіт з платежів та заборгованості. Якщо виникає заборгованість 
+та її термін перевищує місяць з моменту виникнення, повинен нараховуватись штраф в розмірі 10 
+відсотків від суми її суми. Квартплатня нараховується першого числа кожного місяця. 
+Звіти повинні сортуватися та фільтруватися за разними критеріями. 
+*/
+
+class House{
+	String adress;
+	int numOfFlats;
+	int numOfPeople;
+	float totalHouseArea;
+	float totalHouseDebt;
+	
+	int[] flat;
+	int[] people = new int[1000];
+	float[] area = new float[1000];
+	float[] debt = new float[1000];
+	
+	float priceForSquareMeter;
+	
+	public House(String adress, int numOfFlats, int numOfPeople, float totalHouseArea, float totalHouseDebt,float priceForSquareMeter) {
+		   this.adress = adress;
+		   this.numOfFlats = numOfFlats;
+		   this.numOfPeople = numOfPeople;
+		   this.totalHouseArea = totalHouseArea;
+		   this.totalHouseDebt = totalHouseDebt;
+		   this.priceForSquareMeter = priceForSquareMeter;
+		}
+	
+	
+	void changeNumOfPeople(int flatNum, int peopleNum) {
+		people[flatNum] = peopleNum;
+		System.out.printf("Now in %d apartment live %d people\n", flatNum ,people[flatNum]);
+	}
+	
+	void calculateDeb(LocalDate first,LocalDate last) {
+		int month = (int)ChronoUnit.MONTHS.between(first, last);
+		if(first.getMonthValue() < last.getMonthValue() && first.getDayOfMonth() > last.getDayOfMonth()){
+			month++;
+		}
+		//System.out.println(month);
+		for(int i = 0;i < month;i++) {
+			for(int j = 0;j < numOfFlats;j++) {
+				if (debt[j+1] > 0) debt[j+1] = (float) (debt[j+1] * 1.1);
+				debt[j+1] += area[j+1]*priceForSquareMeter;
+			}
+		}
+	}
+	
+	void displayDeb() {
+		for(int j = 0;j < numOfFlats;j++) {
+			
+			System.out.println("Number of flats: " +(j+1)+"  Debt: "+debt[j+1]);
+		}
+	}
+	
+	void payDeb(int flatNum, float payDebt) {
+		debt[flatNum] -= payDebt;
+		System.out.printf("Now debt of %d apartment is %d euro\n", flatNum ,debt[flatNum]);
+	}
+	
+	void displayHouseInfo() {
+		System.out.println("Adress: "+ adress +
+							"\nNumber of people: "+ numOfPeople+
+							"\nNumber of flats: "+ numOfFlats+
+							"\nTotal house area: "+ totalHouseArea+
+							"\nTotal house debt: "+ totalHouseDebt);
+	}
+	
+	void displayFlatInfo(int i) {
+		System.out.println("Apartment number : "+ i +
+							"\nNumber of people: "+ people[i]+
+							"\nArea: "+ area[i]+
+							"\nDebt: "+ debt[i]);
+	}
+}
+
+
